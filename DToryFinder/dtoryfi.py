@@ -24,7 +24,7 @@ Errors = Errors()
 # Presentation
 print('\n\n\n\033[1;34m[+]  DTORY FINDER  [+]\033[m\n'.center(20))
 
-# Read and format the url and wordlist gived by the user
+# Read and format the url and wordlist given by the user
 try:
     wordlist = argv[1]
     url = argv[2]
