@@ -55,5 +55,5 @@ def collect_and_send(addr='127.0.0.1', port=123):
 def collect_and_print():
     print(presentation)
 
-
+# You can replace this function with the other one (collect_and_send), if you want to send the information to another device.
 collect_and_print()
