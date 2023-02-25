@@ -20,7 +20,9 @@ def linux_ver():
 def windows_profile_collector(ssid, codepage = '850'):
     codepage = str(codepage)
     output = check_output(f'netsh wlan show profile "{ssid.strip()}" key=clear', encoding=codepage).split('\n')
-    #profile = [ssid.strip()]
+    # I will update this code to get the current pc language to extract the correct information, but until that
+    # you can translate the strings "Authenticação" and "Conteúdo da Chave" in google translator from Portuguese(Brazil) to the language of your pc and 
+    #replace them in the code
     profile = list(dict.fromkeys([l.strip().replace('\n', '')[l.index(':')-2:] for l in output if 'Autenticação' in l or 'Conteúdo da Chave' in l]))
     profile.sort()
     profile.insert(0, ssid.strip())
@@ -28,6 +30,8 @@ def windows_profile_collector(ssid, codepage = '850'):
 
 def windows_ver():
     ssids = check_output('netsh wlan show profiles', encoding='850')
+    # I will update this code to get the current pc language to extract the correct information, but until that
+    # you can translate the string "Todos os Perfis de Usuários" in google translator from Portuguese(Brazil) to the language of your pc and replace it in the code
     ssids = findall('Todos os Perfis de Usuários:(.*)', ssids)
     profiles = map(windows_profile_collector, ssids)
     return profiles
