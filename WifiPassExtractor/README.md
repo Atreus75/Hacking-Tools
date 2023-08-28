@@ -3,4 +3,4 @@ This is a tool created to extract passwords from wifi networks that the target h
 The program must run on the target machine.
 Please, read the comments in the code to use the tool correctly. Thanks ;)
 
-Tested on: Linux and Windows 10.
+Tested on: Debian 11 and Windows 10.
