@@ -5,12 +5,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
-#include <time.h>
-
-/*Initiates the time measuring of the program*/
-clock_t start, end;
-double cpu_time_used;
-start = clock();
 
 /*Defines a struct type for keymapping the scancodes efficiently*/
 typedef struct {
@@ -22,6 +16,7 @@ typedef struct {
 #define MAX_KEYS 100
 #define KEY_PRESS 1
 #define KEY_RELEASE 0
+
 /*Here is the number of scancodes you want to be able to scan*/
 #define KEYMAP_SIZE 102
 
@@ -31,13 +26,6 @@ typedef struct {
 #define CAPSLOCK 55
 
 int main(int argc, char * argv[]){
-    /*Argument threating*/
-    /*argc--;
-    printf("Argument count: %d\n", argc);
-    for (int c=1; c<=argc; c++){
-	    printf("Argument %d: %s\n", c, argv[c]);
-    }*/
-
     /*Set your own keyboard's scancode layout below. Here is the pattern for ABNT (brazillian) keyboards except for some particularities of my notebook.*/
     KeyMapping keymap[KEYMAP_SIZE] = {
         {1, "[esc]", "[esc]"},
@@ -156,8 +144,10 @@ int main(int argc, char * argv[]){
     int inUpperCase = 0;
     int shiftPressed = 0;
     char typed[MAX_KEYS][10] = {};
+    
 
-    while (!exit && key_counter <= MAX_KEYS){
+    while (!exit){
+
         read(rk, &event, sizeof(event));
         if (event.type == EV_KEY){
 		/*Checks if shift was pressed or released*/
@@ -201,9 +191,5 @@ int main(int argc, char * argv[]){
     for (int c = 0; c < key_counter; c++){
         printf("%s", typed[c]);
     }
-    /*Finalizes time measuring*/
-    end = clock();
-    cpu_time_used = ((double) (end-start)) / CLOCKS_PER_SEC;
-    printf("\nTime taken: %f\n", cpu_time_used);
     return 0;
 }
